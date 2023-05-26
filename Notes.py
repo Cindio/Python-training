@@ -5,9 +5,6 @@ import shelve
 from datetime import datetime
 
 
-
-
-
 def save_tooltip():
     save_it = "SAVE: " + str(text_box.get('1.0', 'end'))
     return save_it
@@ -28,6 +25,7 @@ def get_notes():
 
     def mysort(e):
         return e[0]
+
     set_text = sorted(set_text, key=mysort, reverse=True)
     for item in set_text:
         item = str(item) + '\n'
@@ -47,9 +45,20 @@ def clear_box():
     text_box.delete('1.0', 'end')
 
 
+def insert_emoji(selected):
+    positions = (0.0, 0.5666666666666667)
+    print(emoji_menu.yview())
+    if emoji_menu.yview() == positions:
+        text_box.image_create(text_box.index('insert'), image=aok)
+    else:
+        text_box.image_create(text_box.index('insert'), image=thumbs_down)
+
+
+
 root = tk.Tk()
 root.configure(background="pink")
 root.title("NOTES")
+#root.bind('<Button-1>', insert_emoji)
 style = ttk.Style(root)
 style.configure("TFrame", background="pink", highlightcolor="black", highlightbackground="black")
 button_frame = ttk.Frame(root, width=100, height=40)
@@ -68,11 +77,27 @@ x = tk.PhotoImage(file="/home/cindy/Pictures/icon-x.png")
 delete = tk.Button(button_frame, image=x, bd=2, command=delete_key)
 delete.grid(row=1, column=4, columnspan=1, sticky='w')
 ToolTip(delete, msg="Delete", bg="white")
+
+emoji_listbox = tk.Listbox(
+    button_frame,
+    height=1,
+    selectmode=tk.BROWSE
+)
+
 scrollbar = tk.Scrollbar(orient='horizontal')
-text_box = tk.Text(root, width=100, height=50, takefocus=1, wrap='word', xscrollcommand=scrollbar.set)
-scrollbar.config(command=text_box.xview)
+text_box = tk.Text(root, width=100, height=50, takefocus=1, wrap='word')
 text_box.grid(row=2, columnspan=4)
 scrollbar.grid(row=3)
 text_box.focus_set()
-
+thumbs_down = tk.PhotoImage(name= "thumbs_down", file="/home/cindy/Python-training/thumbsDownSmall.png")
+aok = tk.PhotoImage(name="aok", file="/home/cindy/Python-training/aokSmall.png")
+emoji_frame = tk.Frame(button_frame, width=10, height=4)
+emoji_frame.grid(row=1, column=5, columnspan=3)
+emoji_menu = tk.Text(emoji_frame, yscrollcommand=scrollbar.set, height=2, width=5, cursor="hand2")
+emoji_menu.bind('<Button-1>', insert_emoji)
+scrollbar = ttk.Scrollbar(emoji_frame, orient='vertical', command=emoji_menu.yview)
+emoji_menu.grid(row=1, column=5)
+scrollbar.grid(row=1, column=6)
+aokTexted = emoji_menu.image_create(emoji_menu.index('1.0'), image=aok)
+thumbs_downTexted = emoji_menu.image_create(emoji_menu.index('2.0'), image=thumbs_down)
 root.mainloop()
